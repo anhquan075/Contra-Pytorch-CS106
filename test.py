@@ -14,6 +14,7 @@ def get_args():
         """Implementation of model described in the paper: Proximal Policy Optimization Algorithms for Contra Nes""")
     parser.add_argument("--level", type=int, default=1)
     parser.add_argument("--saved_path", type=str, default="trained_models")
+    parser.add_argument("--method",type=str, default='PPO')
     parser.add_argument("--output_path", type=str, default="output")
     args = parser.parse_args()
     return args
@@ -24,10 +25,10 @@ def test(opt):
     env = create_train_env(opt.level, "{}/video_{}.mp4".format(opt.output_path, opt.level))
     model = PPO(env.observation_space.shape[0], len(ACTION_MAPPING))
     if torch.cuda.is_available():
-        model.load_state_dict(torch.load("{}/ppo_contra_level{}".format(opt.saved_path, opt.level)))
+        model.load_state_dict(torch.load("{}/ppo_contra_level{}_PPO".format(opt.saved_path, opt.level)))
         model.cuda()
     else:
-        model.load_state_dict(torch.load("{}/ppo_contra_level{}".format(opt.saved_path, opt.level),
+        model.load_state_dict(torch.load("{}/ppo_contra_level{}_PPO".format(opt.saved_path, opt.level),
                                          map_location=lambda storage, loc: storage))
     model.eval()
     state = torch.from_numpy(env.reset())

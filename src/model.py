@@ -67,4 +67,4 @@ class ActorCritic(nn.Module):
         x = F.relu(self.conv3(x))
         x = F.relu(self.conv4(x))
         hx, cx = self.lstm(x.view(x.size(0), -1), (hx, cx))
-        return self.actor_linear(hx), self.critic_linear(hx)
+        return self.actor_linear(hx), self.critic_linear(hx), hx, cx
