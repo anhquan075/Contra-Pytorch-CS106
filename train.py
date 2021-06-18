@@ -8,7 +8,7 @@ os.environ['OMP_NUM_THREADS'] = '1'
 import argparse
 import torch
 from src.env import MultipleEnvironments
-from src.model import PPO
+from src.model import PPO, ActorCritic
 from src.process import test
 import torch.multiprocessing as _mp
 from torch.distributions import Categorical
@@ -17,10 +17,12 @@ import numpy as np
 import shutil
 
 
+
 def get_args():
     parser = argparse.ArgumentParser(
         """Implementation of model described in the paper: Proximal Policy Optimization Algorithms for Contra Nes""")
     parser.add_argument("--level", type=int, default=1)
+    parser.add_argument("--method",type=str, default='PPO', help='Choose method: PPO or A3C')
     parser.add_argument('--lr', type=float, default=1e-4)
     parser.add_argument('--gamma', type=float, default=0.9, help='discount factor for rewards')
     parser.add_argument('--tau', type=float, default=1.0, help='parameter for GAE')
@@ -53,7 +55,14 @@ def train(opt):
         os.makedirs(opt.saved_path)
     mp = _mp.get_context("spawn")
     envs = MultipleEnvironments(opt.level, opt.num_processes)
-    model = PPO(envs.num_states, envs.num_actions)
+    model_method = {
+    'PPO': PPO(envs.num_states, envs.num_actions),
+    'A3C': ActorCritic(envs.num_states, envs.num_actions)
+    }
+    try:
+        model = model_method[opt.method]
+    except:
+        raise ValueError('The method must be PPO or A3C method. Please try again.')
     if torch.cuda.is_available():
         model.cuda()
     model.share_memory()
