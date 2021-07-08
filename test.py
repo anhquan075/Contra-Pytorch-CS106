@@ -1,11 +1,7 @@
-"""
-@author: Viet Nguyen <nhviet1009@gmail.com>
-"""
-
 import argparse
 import torch
 from src.env import create_train_env, ACTION_MAPPING
-from src.model import PPO
+from src.model import PPO, ActorCritic
 import torch.nn.functional as F
 
 
@@ -19,10 +15,43 @@ def get_args():
     args = parser.parse_args()
     return args
 
-
-def test(opt):
+def test_a3c(opt):
     torch.manual_seed(123)
-    env = create_train_env(opt.level, "{}/video_{}.mp4".format(opt.output_path, opt.level))
+    env= create_train_env(opt.level, "{}/video_{}_A3C.mp4".format(opt.output_path, opt.level))
+    num_states, num_actions =  env.observation_space.shape[0], len(ACTION_MAPPING)
+    model = ActorCritic(num_states, num_actions)
+
+    model.eval()
+    state = torch.from_numpy(env.reset())
+    done = True
+    while True:
+        if done:
+            h_0 = torch.zeros((1, 512), dtype=torch.float)
+            c_0 = torch.zeros((1, 512), dtype=torch.float)
+            env.reset()
+        else:
+            h_0 = h_0.detach()
+            c_0 = c_0.detach()
+        if torch.cuda.is_available():
+            h_0 = h_0.cuda()
+            c_0 = c_0.cuda()
+            state = state.cuda()
+
+        logits, value, h_0, c_0 = model(state, h_0, c_0)
+        policy = F.softmax(logits, dim=1)
+        action = torch.argmax(policy).item()
+        action = int(action)
+        state, reward, done, info = env.step(action)
+        state = torch.from_numpy(state)
+        env.render()
+        if info["flag_get"]:
+            print("Level {} completed".format(opt.level))
+            break
+
+
+def test_ppo(opt):
+    torch.manual_seed(123)
+    env = create_train_env(opt.level, "{}/video_{}_PPO.mp4".format(opt.output_path, opt.level))
     model = PPO(env.observation_space.shape[0], len(ACTION_MAPPING))
     if torch.cuda.is_available():
         model.load_state_dict(torch.load("{}/ppo_contra_level{}_PPO".format(opt.saved_path, opt.level)))
@@ -48,4 +77,9 @@ def test(opt):
 
 if __name__ == "__main__":
     opt = get_args()
-    test(opt)
+    if opt.method.lower() == 'ppo':
+        test_ppo(opt)
+    elif opt.method.lower() == 'a3c':
+        test_a3c(opt)
+    else:
+        assert "Wrong method, please try again!"
