@@ -1,5 +1,5 @@
 from src.env import MultipleEnvironments, create_train_env
-from src.model import PPO, ActorCritic
+from src.model import PPO, ActorCritic, DeepQNetwork
 from src.process import test, local_test, local_train
 from src.optimizer import GlobalAdam
 from src.env import ACTION_MAPPING
@@ -7,9 +7,16 @@ from src.env import ACTION_MAPPING
 import torch.multiprocessing as _mp
 from torch.distributions import Categorical
 import torch.nn.functional as F
+import torch.nn as nn
+from tensorboardX import SummaryWriter
 
 import numpy as np
 import torch
+
+import os 
+import shutil
+from random import random, randint, sample
+from collections import deque
 
 
 def A3C_training(opt):

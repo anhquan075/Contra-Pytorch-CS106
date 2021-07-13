@@ -1,7 +1,3 @@
-"""
-@author: Viet Nguyen <nhviet1009@gmail.com>
-"""
-
 import os
 
 os.environ['OMP_NUM_THREADS'] = '1'
@@ -12,10 +8,9 @@ import shutil
 from src.method import PPO_training, A3C_training
 
 
-
 def get_args():
     parser = argparse.ArgumentParser(
-        """Implementation of model described in the paper: Proximal Policy Optimization Algorithms for Contra Nes""")
+        """Implementation of model: Proximal Policy Optimization, A3C Algorithms for Contra Nes""")
     parser.add_argument("--level", type=int, default=1)
     parser.add_argument("--method",type=str, default='PPO', help='Choose method: PPO or A3C')
     parser.add_argument('--lr', type=float, default=1e-4)
@@ -35,8 +30,11 @@ def get_args():
     parser.add_argument("--saved_path", type=str, default="trained_models")
     parser.add_argument("--load_from_previous_stage", type=bool, default=False,
                         help="Load weight from previous trained stage")
+    parser.add_argument("--replay_memory_size", type=int, default=50000,
+                        help="Number of epoches between testing phases")
     args = parser.parse_args()
     return args
+
 
 
 def train(opt):
@@ -50,13 +48,14 @@ def train(opt):
     if not os.path.isdir(opt.saved_path):
         os.makedirs(opt.saved_path)
     
-    if opt.method.upper() == 'PPO':
-        PPO_training(opt)
-    elif opt.method.upper() == 'A3C':
-        A3C_training(opt)
-    else:
-        raise TypeError("Choose two avaiable method: PPO or A3C. Please try again.")
-        
+    method = {
+        'PPO': PPO_training,
+        'A3C': A3C_training
+    }
+    try:
+        method[opt.method.upper()](opt)
+    except:
+        assert "Just support PPO and A3C method. Please try again."
 
 
 if __name__ == "__main__":

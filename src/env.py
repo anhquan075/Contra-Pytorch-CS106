@@ -36,7 +36,7 @@ class Monitor:
 
     def record(self, image_array):
         self.pipe.stdin.write(image_array.tostring())
-
+    
 
 def process_frame(frame):
     if frame is not None:

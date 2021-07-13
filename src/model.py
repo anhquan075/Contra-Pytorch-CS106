@@ -1,10 +1,5 @@
-"""
-@author: Viet Nguyen <nhviet1009@gmail.com>
-"""
-
 import torch.nn as nn
 import torch.nn.functional as F
-
 
 class PPO(nn.Module):
     def __init__(self, num_inputs, num_actions):
