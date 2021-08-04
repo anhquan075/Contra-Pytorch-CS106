@@ -1,5 +1,5 @@
 from src.env import MultipleEnvironments, create_train_env
-from src.model import PPO, ActorCritic, DeepQNetwork
+from src.model import PPO, ActorCritic
 from src.process import test, local_test, local_train
 from src.optimizer import GlobalAdam
 from src.env import ACTION_MAPPING

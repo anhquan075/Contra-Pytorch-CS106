@@ -22,10 +22,10 @@ def test_a3c(opt):
     model = ActorCritic(num_states, num_actions)
 
     if torch.cuda.is_available():
-        model.load_state_dict(torch.load("{}/ppo_contra_level_{}_A3C".format(opt.saved_path, opt.level)))
+        model.load_state_dict(torch.load("{}/a3c_contra_level_{}_A3C".format(opt.saved_path, opt.level)))
         model.cuda()
     else:
-        model.load_state_dict(torch.load("{}/ppo_contra_level_{}_A3C".format(opt.saved_path, opt.level), map_location=torch.device('cpu')))
+        model.load_state_dict(torch.load("{}/a3c_contra_level_{}_A3C".format(opt.saved_path, opt.level), map_location=torch.device('cpu')))
 
     model.eval()
     state = torch.from_numpy(env.reset())
@@ -50,7 +50,7 @@ def test_a3c(opt):
         state, reward, done, info = env.step(action)
         state = torch.from_numpy(state)
         env.render()
-        if info["level"] > opt.level:
+        if info["level"] > opt.level or done:
             print("Level {} completed".format(opt.level))
             break
 

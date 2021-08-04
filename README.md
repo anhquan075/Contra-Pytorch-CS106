@@ -1,4 +1,4 @@
-# [PYTORCH] Proximal Policy Optimization (PPO) for Contra Nes
+# [PYTORCH] Proximal Policy Optimization (PPO) and A3C for Contra Nes
 
 ## Introduction
 

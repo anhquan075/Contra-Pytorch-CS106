@@ -1,5 +1,6 @@
 import torch.nn as nn
 import torch.nn.functional as F
+import torch 
 
 class PPO(nn.Module):
     def __init__(self, num_inputs, num_actions):
